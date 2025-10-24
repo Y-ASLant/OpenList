@@ -1,8 +1,6 @@
 set -e
 appName="openlist"
 builtAt="$(date +'%F %T %z')"
-gitAuthor="The OpenList Projects Contributors <noreply@openlist.team>"
-gitCommit=$(git log --pretty=format:"%h" -1)
 
 # Set frontend repository, default to OpenListTeam/OpenList-Frontend
 frontendRepo="${FRONTEND_REPO:-OpenListTeam/OpenList-Frontend}"
@@ -42,8 +40,6 @@ fi
 ldflags="\
 -w -s \
 -X 'github.com/OpenListTeam/OpenList/v4/internal/conf.BuiltAt=$builtAt' \
--X 'github.com/OpenListTeam/OpenList/v4/internal/conf.GitAuthor=$gitAuthor' \
--X 'github.com/OpenListTeam/OpenList/v4/internal/conf.GitCommit=$gitCommit' \
 -X 'github.com/OpenListTeam/OpenList/v4/internal/conf.Version=$version' \
 -X 'github.com/OpenListTeam/OpenList/v4/internal/conf.WebVersion=$webVersion' \
 "

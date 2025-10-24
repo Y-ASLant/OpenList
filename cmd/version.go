@@ -21,11 +21,9 @@ var VersionCmd = &cobra.Command{
 
 		fmt.Printf(`Built At: %s
 Go Version: %s
-Author: %s
-Commit ID: %s
 Version: %s
 WebVersion: %s
-`, conf.BuiltAt, goVersion, conf.GitAuthor, conf.GitCommit, conf.Version, conf.WebVersion)
+`, conf.BuiltAt, goVersion, conf.Version, conf.WebVersion)
 		os.Exit(0)
 	},
 }

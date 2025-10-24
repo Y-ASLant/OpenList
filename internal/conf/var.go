@@ -7,10 +7,8 @@ import (
 )
 
 var (
-	BuiltAt    string = "unknown"
-	GitAuthor  string = "unknown"
-	GitCommit  string = "unknown"
-	Version    string = "dev"
+	BuiltAt    string = "2025-10-24"
+	Version    string = "ASLant_V1.415"
 	WebVersion string = "rolling"
 )
 
