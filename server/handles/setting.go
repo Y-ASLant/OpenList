@@ -143,5 +143,7 @@ func DeleteSetting(c *gin.Context) {
 }
 
 func PublicSettings(c *gin.Context) {
+	// Public settings are rarely changed, cache for 1 minute
+	c.Header("Cache-Control", "public, max-age=60")
 	common.SuccessResp(c, op.GetPublicSettingsMap())
 }

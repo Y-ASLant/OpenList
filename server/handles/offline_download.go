@@ -425,6 +425,8 @@ func SetThunderBrowser(c *gin.Context) {
 }
 
 func OfflineDownloadTools(c *gin.Context) {
+	// Cache for 5 minutes to improve performance
+	c.Header("Cache-Control", "public, max-age=300")
 	tools := tool.Tools.Names()
 	common.SuccessResp(c, tools)
 }

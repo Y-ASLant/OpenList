@@ -421,6 +421,8 @@ func ArchiveInternalExtract(c *gin.Context) {
 }
 
 func ArchiveExtensions(c *gin.Context) {
+	// Cache for 5 minutes to improve performance
+	c.Header("Cache-Control", "public, max-age=300")
 	var ext []string
 	for key := range tool.Tools {
 		ext = append(ext, key)
