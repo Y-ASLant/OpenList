@@ -182,9 +182,18 @@ func Static(r *gin.RouterGroup, noRoute func(handlers ...gin.HandlerFunc)) {
 	initIndex(siteConfig)
 	folders := []string{"assets", "images", "streamer", "static"}
 
-	if conf.Conf.Cdn == "" {
+	// 判断是否使用 CDN：检查 siteConfig.Cdn 是否为空或等于 basePath（表示本地加载）
+	useCdn := siteConfig.Cdn != "" && siteConfig.Cdn != strings.TrimSuffix(siteConfig.BasePath, "/")
+
+	if !useCdn {
 		utils.Log.Debug("Setting up static file serving...")
 		r.Use(func(c *gin.Context) {
+			// Special handling for mermaid.min.js to always use CDN
+			if c.Request.RequestURI == "/static/mermaid/mermaid.min.js" {
+				c.Redirect(http.StatusMovedPermanently, "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js")
+				c.Abort()
+				return
+			}
 			for _, folder := range folders {
 				if strings.HasPrefix(c.Request.RequestURI, fmt.Sprintf("/%s/", folder)) {
 					c.Header("Cache-Control", "public, max-age=15552000")
@@ -201,10 +210,18 @@ func Static(r *gin.RouterGroup, noRoute func(handlers ...gin.HandlerFunc)) {
 		}
 	} else {
 		// Ensure static file redirected to CDN
+		utils.Log.Infof("Redirecting static files to CDN: %s", siteConfig.Cdn)
 		for _, folder := range folders {
+			// Capture folder variable for closure
+			folderName := folder
 			r.GET(fmt.Sprintf("/%s/*filepath", folder), func(c *gin.Context) {
 				filepath := c.Param("filepath")
-				c.Redirect(http.StatusFound, fmt.Sprintf("%s/%s%s", siteConfig.Cdn, folder, filepath))
+				// Special handling for mermaid.min.js to always use jsDelivr CDN
+				if folderName == "static" && filepath == "/mermaid/mermaid.min.js" {
+					c.Redirect(http.StatusMovedPermanently, "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js")
+					return
+				}
+				c.Redirect(http.StatusFound, fmt.Sprintf("%s/%s%s", siteConfig.Cdn, folderName, filepath))
 			})
 		}
 	}
