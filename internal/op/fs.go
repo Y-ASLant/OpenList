@@ -237,7 +237,7 @@ func Other(ctx context.Context, storage driver.Driver, args model.FsOtherArgs) (
 			Data:   args.Data,
 		})
 	} else {
-		return nil, errs.NotImplement
+		return nil, errors.WithStack(errs.NotImplement)
 	}
 }
 
@@ -286,7 +286,7 @@ func MakeDir(ctx context.Context, storage driver.Driver, path string, lazyCache 
 						Cache.DeleteDirectory(storage, parentPath)
 					}
 				default:
-					return nil, errs.NotImplement
+					return nil, errors.WithStack(errs.NotImplement)
 				}
 				return nil, errors.WithStack(err)
 			}
@@ -297,7 +297,7 @@ func MakeDir(ctx context.Context, storage driver.Driver, path string, lazyCache 
 			return nil, nil
 		}
 		// dir to make is a file
-		return nil, errors.New("file exists")
+		return nil, errors.WithStack(errs.ObjectAlreadyExists)
 	})
 	return err
 }
@@ -343,7 +343,7 @@ func Move(ctx context.Context, storage driver.Driver, srcPath, dstDirPath string
 			}
 		}
 	default:
-		return errs.NotImplement
+		return errors.WithStack(errs.NotImplement)
 	}
 	return errors.WithStack(err)
 }
@@ -384,7 +384,7 @@ func Rename(ctx context.Context, storage driver.Driver, srcPath, dstName string,
 			}
 		}
 	default:
-		return errs.NotImplement
+		return errors.WithStack(errs.NotImplement)
 	}
 	return errors.WithStack(err)
 }
@@ -428,7 +428,7 @@ func Copy(ctx context.Context, storage driver.Driver, srcPath, dstDirPath string
 			}
 		}
 	default:
-		return errs.NotImplement
+		return errors.WithStack(errs.NotImplement)
 	}
 	return errors.WithStack(err)
 }
@@ -459,7 +459,7 @@ func Remove(ctx context.Context, storage driver.Driver, path string) error {
 			Cache.removeDirectoryObject(storage, dirPath, rawObj)
 		}
 	default:
-		return errs.NotImplement
+		return errors.WithStack(errs.NotImplement)
 	}
 	return errors.WithStack(err)
 }
@@ -542,7 +542,7 @@ func Put(ctx context.Context, storage driver.Driver, dstDirPath string, file mod
 			}
 		}
 	default:
-		return errs.NotImplement
+		return errors.WithStack(errs.NotImplement)
 	}
 	log.Debugf("put file [%s] done", file.GetName())
 	if storage.Config().NoOverwriteUpload && fi != nil && fi.GetSize() > 0 {
@@ -568,15 +568,15 @@ func PutURL(ctx context.Context, storage driver.Driver, dstDirPath, dstName, url
 	dstPath := stdpath.Join(dstDirPath, dstName)
 	_, err := GetUnwrap(ctx, storage, dstPath)
 	if err == nil {
-		return errors.New("obj already exists")
+		return errors.WithStack(errs.ObjectAlreadyExists)
 	}
 	err = MakeDir(ctx, storage, dstDirPath)
 	if err != nil {
-		return errors.WithMessagef(err, "failed to put url")
+		return errors.WithMessagef(err, "failed to make dir [%s]", dstDirPath)
 	}
 	dstDir, err := GetUnwrap(ctx, storage, dstDirPath)
 	if err != nil {
-		return errors.WithMessagef(err, "failed to put url")
+		return errors.WithMessagef(err, "failed to get dir [%s]", dstDirPath)
 	}
 	switch s := storage.(type) {
 	case driver.PutURLResult:
@@ -599,7 +599,7 @@ func PutURL(ctx context.Context, storage driver.Driver, dstDirPath, dstName, url
 			}
 		}
 	default:
-		return errs.NotImplement
+		return errors.WithStack(errs.NotImplement)
 	}
 	log.Debugf("put url [%s](%s) done", dstName, url)
 	return errors.WithStack(err)
