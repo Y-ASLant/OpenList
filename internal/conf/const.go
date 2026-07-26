@@ -12,6 +12,7 @@ const (
 	// site
 	VERSION      = "version"
 	SiteTitle    = "site_title"
+	SiteIcp      = "site_icp"
 	Announcement = "announcement"
 	AllowIndexed = "allow_indexed"
 	AllowMounted = "allow_mounted"
